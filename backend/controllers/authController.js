@@ -4,12 +4,13 @@ const jwt = require('jsonwebtoken');
 
 exports.adminLogin = async (req, res) => {
     try {
-        const { email, password } = req.body;
+        // 🚨 Email ki jagah ab hum "mobile" accept karenge
+        const { mobile, password } = req.body;
 
-        // 1. Check Admin
-        const admin = await Admin.findOne({ email });
+        // 1. Check Admin by Mobile Number
+        const admin = await Admin.findOne({ mobile });
         if (!admin) {
-            return res.status(404).json({ message: "Admin account nahi mila!" });
+            return res.status(404).json({ message: "Is mobile number se koi admin account nahi mila!" });
         }
 
         // 2. Compare Password
@@ -27,6 +28,11 @@ exports.adminLogin = async (req, res) => {
 
         res.status(200).json({
             token,
+            admin: {
+                id: admin._id,
+                name: admin.name,
+                mobile: admin.mobile
+            },
             message: "Login successful!"
         });
 
