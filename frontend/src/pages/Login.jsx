@@ -41,7 +41,7 @@ const Login = () => {
                     <div className="space-y-1">
                         <label className="text-[10px] font-black uppercase text-slate-300 ml-4">Email Address</label>
                         <input
-                            type="email"
+                            type="text"
                             placeholder="your@email.com"
                             className="w-full p-5 bg-slate-50 rounded-3xl border-none outline-none font-bold text-slate-700 focus:ring-2 focus:ring-[#d4af37]/20 transition-all"
                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
