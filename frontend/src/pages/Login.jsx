@@ -1,38 +1,79 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import UserNavbar from '../components/UserNavbar';
+import { useNavigate, Link } from 'react-router-dom';
 
 const Login = () => {
-    const [formData, setFormData] = useState({ mobile: '', password: '' });
+    const [formData, setFormData] = useState({ email: '', password: '' });
     const navigate = useNavigate();
 
-    const handleLogin = async (e) => {
+    // 🔥 YE HAI ASALI LINK (RENDER WALA)
+    const BACKEND_URL = 'https://grainiac-backend.onrender.com';
+
+    const onSubmit = async (e) => {
         e.preventDefault();
         try {
-            const res = await axios.post('http://localhost:5000/api/auth/login', formData);
-            localStorage.setItem('user', JSON.stringify(res.data.user)); // Login session save karein
-            alert("Welcome back!");
+            // Ab ye localhost ki jagah seedha Render par jayega
+            const res = await axios.post(`${BACKEND_URL}/api/auth/login`, formData);
+
+            // Token aur user details save karna zaroori hai
+            localStorage.setItem('token', res.data.token);
+            localStorage.setItem('user', JSON.stringify(res.data.user));
+
+            alert("Login Successful! Swagat hai, Minhaj bhai.");
+
+            // Login ke baad kahan jana hai? Home page par:
             navigate('/');
         } catch (err) {
-            alert(err.response?.data?.message || "Login failed!");
+            console.error("Login Error:", err);
+            alert(err.response?.data?.message || "Login Failed. Check connection!");
         }
     };
 
     return (
-        <div className="bg-slate-50 min-h-screen">
-            <UserNavbar />
-            <div className="max-w-md mx-auto mt-20 p-10 bg-white rounded-[3rem] shadow-2xl border">
-                <h2 className="text-3xl font-black mb-8 text-center tracking-tighter italic text-slate-900">MEMBER LOGIN</h2>
-                <form onSubmit={handleLogin} className="space-y-5">
-                    <input type="number" placeholder="Mobile Number" className="w-full p-4 bg-slate-50 rounded-2xl outline-none border focus:border-[#d4af37]" onChange={e => setFormData({ ...formData, mobile: e.target.value })} required />
-                    <input type="password" placeholder="Password" className="w-full p-4 bg-slate-50 rounded-2xl outline-none border focus:border-[#d4af37]" onChange={e => setFormData({ ...formData, password: e.target.value })} required />
-                    <button className="w-full bg-black text-white py-5 rounded-2xl font-black text-lg hover:bg-[#d4af37] transition-all shadow-lg">LOG IN</button>
-                </form>
-                <p className="mt-8 text-center text-xs font-bold text-slate-400 uppercase tracking-widest">
-                    New to Grainiac? <span className="text-black cursor-pointer underline" onClick={() => navigate('/signup')}>Sign Up Now</span>
-                </p>
-            </div>
+        <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4 font-sans">
+            <form onSubmit={onSubmit} className="bg-white p-8 md:p-12 rounded-[2.5rem] md:rounded-[4rem] shadow-sm border w-full max-w-md">
+                <header className="mb-8">
+                    <h2 className="text-4xl font-black italic uppercase tracking-tighter leading-none">Login</h2>
+                    <p className="text-slate-400 font-bold uppercase text-[10px] tracking-widest mt-2">Grainiac Luxe Admin Access</p>
+                </header>
+
+                <div className="space-y-4">
+                    <div className="space-y-1">
+                        <label className="text-[10px] font-black uppercase text-slate-300 ml-4">Email Address</label>
+                        <input
+                            type="email"
+                            placeholder="your@email.com"
+                            className="w-full p-5 bg-slate-50 rounded-3xl border-none outline-none font-bold text-slate-700 focus:ring-2 focus:ring-[#d4af37]/20 transition-all"
+                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                            required
+                        />
+                    </div>
+
+                    <div className="space-y-1">
+                        <label className="text-[10px] font-black uppercase text-slate-300 ml-4">Password</label>
+                        <input
+                            type="password"
+                            placeholder="••••••••"
+                            className="w-full p-5 bg-slate-50 rounded-3xl border-none outline-none font-bold text-slate-700 focus:ring-2 focus:ring-[#d4af37]/20 transition-all"
+                            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                            required
+                        />
+                    </div>
+
+                    <button
+                        type="submit"
+                        className="w-full bg-slate-900 text-[#d4af37] p-6 rounded-3xl font-black uppercase tracking-widest hover:bg-black hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-slate-200 mt-4"
+                    >
+                        Access Dashboard
+                    </button>
+                </div>
+
+                <div className="mt-8 text-center border-t pt-6">
+                    <p className="text-slate-400 font-bold text-xs uppercase tracking-tight">
+                        Don't have an account? <Link to="/signup" className="text-slate-900 underline underline-offset-4 decoration-[#d4af37] decoration-2">Create One</Link>
+                    </p>
+                </div>
+            </form>
         </div>
     );
 };
