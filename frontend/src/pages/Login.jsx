@@ -3,29 +3,26 @@ import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 
 const Login = () => {
-    const [formData, setFormData] = useState({ email: '', password: '' });
+    // Ab yahan email ki jagah mobile hai
+    const [formData, setFormData] = useState({ mobile: '', password: '' });
     const navigate = useNavigate();
 
-    // 🔥 YE HAI ASALI LINK (RENDER WALA)
     const BACKEND_URL = 'https://grainiac-backend.onrender.com';
 
     const onSubmit = async (e) => {
         e.preventDefault();
         try {
-            // Ab ye localhost ki jagah seedha Render par jayega
+            // Backend ko mobile aur password bhej rahe hain
             const res = await axios.post(`${BACKEND_URL}/api/auth/login`, formData);
 
-            // Token aur user details save karna zaroori hai
             localStorage.setItem('token', res.data.token);
             localStorage.setItem('user', JSON.stringify(res.data.user));
 
-            alert("Login Successful! Swagat hai, Minhaj bhai.");
-
-            // Login ke baad kahan jana hai? Home page par:
+            alert("Login Successful!");
             navigate('/');
         } catch (err) {
             console.error("Login Error:", err);
-            alert(err.response?.data?.message || "Login Failed. Check connection!");
+            alert(err.response?.data?.message || "Login Failed! Mobile ya Password galat hai.");
         }
     };
 
@@ -39,12 +36,12 @@ const Login = () => {
 
                 <div className="space-y-4">
                     <div className="space-y-1">
-                        <label className="text-[10px] font-black uppercase text-slate-300 ml-4">Email Address</label>
+                        <label className="text-[10px] font-black uppercase text-slate-300 ml-4">Mobile Number</label>
                         <input
-                            type="text"
-                            placeholder="your@email.com"
+                            type="number"
+                            placeholder="Enter Registered Mobile"
                             className="w-full p-5 bg-slate-50 rounded-3xl border-none outline-none font-bold text-slate-700 focus:ring-2 focus:ring-[#d4af37]/20 transition-all"
-                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                            onChange={(e) => setFormData({ ...formData, mobile: e.target.value })}
                             required
                         />
                     </div>
@@ -70,7 +67,7 @@ const Login = () => {
 
                 <div className="mt-8 text-center border-t pt-6">
                     <p className="text-slate-400 font-bold text-xs uppercase tracking-tight">
-                        Don't have an account? <Link to="/signup" className="text-slate-900 underline underline-offset-4 decoration-[#d4af37] decoration-2">Create One</Link>
+                        New Member? <Link to="/signup" className="text-slate-900 underline underline-offset-4 decoration-[#d4af37] decoration-2">Join the Club</Link>
                     </p>
                 </div>
             </form>
