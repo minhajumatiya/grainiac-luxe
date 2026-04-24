@@ -12,7 +12,7 @@ const ProductDetail = () => {
     const [selectedSize, setSelectedSize] = useState("");
 
     useEffect(() => {
-        axios.get(`http://localhost:5000/api/products`).then(res => {
+        axios.get(`https://grainiac-luxe-backend.onrender.com/api/products`).then(res => {
             const found = res.data.find(p => p._id === id);
             setProduct(found);
             if (found && found.sizes.length > 0) setSelectedSize(found.sizes[0]);

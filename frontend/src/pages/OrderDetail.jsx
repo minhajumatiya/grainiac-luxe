@@ -10,7 +10,7 @@ const OrderDetail = () => {
     const [order, setOrder] = useState(null);
 
     // Render Backend URL setup
-    const BACKEND_URL = 'https://grainiac-backend.onrender.com';
+    const BACKEND_URL = 'https://grainiac-luxe-backend.onrender.com';
 
     const fetchDetail = async () => {
         try {

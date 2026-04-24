@@ -5,7 +5,7 @@ import { ShoppingBag, Users, IndianRupee, Package } from 'lucide-react';
 
 const Dashboard = () => {
     const [stats, setStats] = useState({ orders: 0, products: 0, customers: 0, revenue: 0 });
-    const BACKEND_URL = 'https://grainiac-backend.onrender.com';
+    const BACKEND_URL = 'https://grainiac-luxe-backend.onrender.com';
 
     useEffect(() => {
         const fetchStats = async () => {

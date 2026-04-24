@@ -8,7 +8,7 @@ const Signup = () => {
     const navigate = useNavigate();
 
     // 🔥 LIVE BACKEND URL
-    const BACKEND_URL = 'https://grainiac-backend.onrender.com';
+    const BACKEND_URL = 'https://grainiac-luxe-backend.onrender.com';
 
     const handleSignup = async (e) => {
         e.preventDefault();

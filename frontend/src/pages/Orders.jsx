@@ -8,7 +8,7 @@ const Orders = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        axios.get('http://localhost:5000/api/orders').then(res => setOrders(res.data));
+        axios.get('https://grainiac-luxe-backend.onrender.com').then(res => setOrders(res.data));
     }, []);
 
     return (

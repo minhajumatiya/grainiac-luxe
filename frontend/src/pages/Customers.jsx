@@ -5,7 +5,7 @@ import { User, Mail, Phone } from 'lucide-react';
 
 const Customers = () => {
     const [customers, setCustomers] = useState([]);
-    const BACKEND_URL = 'https://grainiac-backend.onrender.com';
+    const BACKEND_URL = 'https://grainiac-luxe-backend.onrender.com';
 
     useEffect(() => {
         const fetchCustomers = async () => {

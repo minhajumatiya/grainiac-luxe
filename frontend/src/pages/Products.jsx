@@ -5,7 +5,7 @@ import { Plus, Trash2, Package } from 'lucide-react';
 
 const Products = () => {
     const [products, setProducts] = useState([]);
-    const BACKEND_URL = 'https://grainiac-backend.onrender.com';
+    const BACKEND_URL = 'https://grainiac-luxe-backend.onrender.com';
 
     const fetchProducts = async () => {
         try {

@@ -7,7 +7,7 @@ const Login = () => {
     const [formData, setFormData] = useState({ mobile: '', password: '' });
     const navigate = useNavigate();
 
-    const BACKEND_URL = 'https://grainiac-backend.onrender.com';
+    const BACKEND_URL = 'https://grainiac-luxe-backend.onrender.com';
 
     const onSubmit = async (e) => {
         e.preventDefault();
