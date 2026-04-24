@@ -5,31 +5,26 @@ const AdminDashboard = () => {
     const [products, setProducts] = useState([]);
     const [customers, setCustomers] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [showForm, setShowForm] = useState(false); // Form toggle karne ke liye
 
-    // 🔥 LIVE BACKEND URL
     const BACKEND_URL = 'https://grainiac-luxe-backend.onrender.com';
 
-    // 1. Data Load karne ka Logic (Safe Fetch)
     const loadData = async () => {
         setLoading(true);
-
-        // Products fetch karo
+        // Products load karo
         try {
             const pRes = await axios.get(`${BACKEND_URL}/api/products`);
             setProducts(pRes.data || []);
-        } catch (err) {
-            console.log("Products load nahi ho paye");
-        }
+        } catch (err) { console.log("Products load error"); }
 
-        // Customers fetch karo (Agar ye fail hua toh bhi Dashboard chalta rahega)
+        // Customers load karo (Safe fetch)
         try {
             const cRes = await axios.get(`${BACKEND_URL}/api/customers`);
             setCustomers(cRes.data || []);
         } catch (err) {
-            console.log("Customers 404: Abhi route nahi bana hai, tension mat lo.");
-            setCustomers([]); // Khali array set kar do
+            console.log("Customers route not found, keeping empty list.");
+            setCustomers([]);
         }
-
         setLoading(false);
     };
 
@@ -37,105 +32,106 @@ const AdminDashboard = () => {
         loadData();
     }, []);
 
-    // 2. Delete Logic
     const handleDelete = async (id) => {
-        if (window.confirm("Pakka delete karna hai?")) {
+        if (window.confirm("🗑️ Pakka delete karna hai?")) {
             try {
                 await axios.delete(`${BACKEND_URL}/api/products/${id}`);
-                alert("🗑️ Product Hat gaya!");
-                loadData(); // List refresh karo
-            } catch (err) {
-                alert("Delete fail ho gaya!");
-            }
+                loadData();
+            } catch (err) { alert("Delete fail!"); }
         }
     };
 
-    if (loading) return <div className="p-10 text-center font-bold">Grainiac Luxe Loading...</div>;
+    if (loading) return <div className="min-h-screen flex items-center justify-center font-black uppercase italic tracking-tighter text-2xl">Grainiac Luxe Loading...</div>;
 
     return (
-        <div className="min-h-screen bg-slate-50 p-6 md:p-12">
-            <div className="max-w-6xl mx-auto">
-                <h1 className="text-4xl font-black italic uppercase mb-10 text-slate-900 border-b-4 border-black inline-block">
-                    Admin Dashboard
-                </h1>
+        <div className="min-h-screen bg-white text-slate-900 font-sans p-4 md:p-10">
+            <div className="max-w-7xl mx-auto">
 
-                {/* --- STATS CARDS --- */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-                    <div className="bg-white p-8 rounded-[2rem] shadow-sm border">
-                        <p className="text-slate-400 text-xs font-bold uppercase tracking-widest">Total Products</p>
-                        <h3 className="text-4xl font-black">{products.length}</h3>
+                {/* --- HEADER --- */}
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 border-b-2 border-slate-100 pb-10">
+                    <div>
+                        <p className="text-[#d4af37] font-black text-[10px] uppercase tracking-[0.4em] mb-3">Administrator Control</p>
+                        <h1 className="text-6xl font-black tracking-tighter uppercase italic leading-none">
+                            Inventory <span className="text-slate-300">Hub</span>
+                        </h1>
                     </div>
-                    <div className="bg-white p-8 rounded-[2rem] shadow-sm border">
-                        <p className="text-slate-400 text-xs font-bold uppercase tracking-widest">Active Customers</p>
-                        <h3 className="text-4xl font-black">{customers.length}</h3>
+                    <div className="mt-6 md:mt-0 flex gap-4">
+                        <div className="text-right">
+                            <p className="text-slate-400 font-bold text-[10px] uppercase tracking-widest">Total Scents</p>
+                            <p className="text-3xl font-black italic">{products.length}</p>
+                        </div>
+                        <div className="w-[1px] bg-slate-200 h-10 self-center"></div>
+                        <div className="text-right">
+                            <p className="text-slate-400 font-bold text-[10px] uppercase tracking-widest">Clients</p>
+                            <p className="text-3xl font-black italic">{customers.length}</p>
+                        </div>
                     </div>
                 </div>
 
-                {/* --- ADD PRODUCT SECTION (Hamesha dikhega) --- */}
-                <div className="bg-black text-white p-10 rounded-[3rem] mb-12 shadow-2xl">
-                    <h2 className="text-2xl font-bold mb-6 uppercase tracking-tighter">Add New Perfume</h2>
-                    <p className="text-gray-400 mb-6 text-sm">Naya product add karne ke liye niche wala form bhariye.</p>
-
-                    {/* Yahan aapka AddProduct Component ya Form aayega */}
+                {/* --- ACTION BAR --- */}
+                <div className="flex justify-between items-center mb-10">
+                    <h2 className="text-xl font-black uppercase tracking-tight">Active Collection</h2>
                     <button
-                        onClick={() => window.location.href = '/add-product'} // Ya jahan bhi aapka add form hai
-                        className="bg-[#d4af37] text-black px-8 py-3 rounded-xl font-black uppercase text-xs tracking-widest hover:bg-white transition-all"
+                        onClick={() => setShowForm(!showForm)}
+                        className="bg-black text-white px-8 py-4 rounded-full font-black text-[10px] uppercase tracking-[0.2em] hover:bg-[#d4af37] transition-all shadow-xl active:scale-95"
                     >
-                        Open Add Product Form
+                        {showForm ? "✕ Close Form" : "+ Add New Perfume"}
                     </button>
                 </div>
 
-                {/* --- PRODUCT LIST --- */}
-                <div className="bg-white rounded-[3rem] shadow-sm border overflow-hidden">
-                    <div className="p-8 border-b bg-slate-50">
-                        <h2 className="font-black uppercase tracking-tight">Current Inventory</h2>
+                {/* --- ADD PRODUCT FORM (Toggle logic) --- */}
+                {showForm && (
+                    <div className="mb-16 bg-slate-50 p-10 rounded-[3rem] border-2 border-black border-dashed animate-in fade-in slide-in-from-top-4 duration-500">
+                        <p className="text-center font-bold text-slate-400 uppercase text-xs mb-4">Form Section</p>
+                        {/* Minhaj bhai, yahan apna AddProduct.jsx wala form render karlo ya component dalo */}
+                        <div className="text-center py-10">
+                            <h3 className="text-2xl font-black italic mb-4">Ready to add a new scent?</h3>
+                            <p className="text-slate-500 mb-6">Apne product details yahan bhariye (Ya /add-product page ka use karein)</p>
+                            <button className="border-2 border-black px-10 py-3 rounded-full font-bold uppercase text-[10px]">Open Full Form Editor</button>
+                        </div>
                     </div>
+                )}
 
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left">
-                            <thead>
-                                <tr className="text-[10px] uppercase tracking-widest text-slate-400 border-b">
-                                    <th className="p-6">Product</th>
-                                    <th className="p-6">Category</th>
-                                    <th className="p-6">Price</th>
-                                    <th className="p-6">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {products.map(p => (
-                                    <tr key={p._id} className="border-b hover:bg-slate-50 transition-colors">
-                                        <td className="p-6">
-                                            <div className="flex items-center gap-4">
-                                                <img src={`${BACKEND_URL}${p.imageUrl}`} className="w-12 h-12 object-contain bg-slate-100 rounded-lg" alt="" />
-                                                <span className="font-bold text-slate-800">{p.name}</span>
-                                            </div>
-                                        </td>
-                                        <td className="p-6 text-xs font-bold text-slate-500 uppercase">{p.category}</td>
-                                        <td className="p-6 font-black text-slate-900">₹{p.price}</td>
-                                        <td className="p-6">
-                                            <button
-                                                onClick={() => handleDelete(p._id)}
-                                                className="text-red-500 font-bold text-[10px] uppercase hover:underline"
-                                            >
-                                                Delete
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
-                                {products.length === 0 && (
-                                    <tr>
-                                        <td colSpan="4" className="p-20 text-center text-slate-300 font-bold uppercase italic">
-                                            Abhi koi product nahi hai. Naya add kijiye!
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
+                {/* --- PRODUCT GRID (Premium Card Design) --- */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                    {products.map((p) => (
+                        <div key={p._id} className="group relative bg-slate-50 rounded-[2.5rem] p-6 border border-transparent hover:border-slate-200 hover:bg-white hover:shadow-2xl transition-all duration-500">
+                            <div className="aspect-square mb-6 overflow-hidden rounded-[2rem] bg-white border border-slate-100 p-6 flex items-center justify-center">
+                                <img
+                                    src={`${BACKEND_URL}${p.imageUrl}`}
+                                    className="w-full h-full object-contain group-hover:scale-110 transition duration-700"
+                                    alt={p.name}
+                                />
+                            </div>
+
+                            <div className="mb-6">
+                                <p className="text-[#d4af37] font-black text-[9px] uppercase tracking-widest mb-1">{p.brand}</p>
+                                <h3 className="text-xl font-black uppercase tracking-tighter leading-tight mb-2">{p.name}</h3>
+                                <div className="flex justify-between items-center">
+                                    <span className="text-2xl font-black italic">₹{p.price}</span>
+                                    <span className="bg-slate-200 text-[8px] font-black px-3 py-1 rounded-full uppercase tracking-tighter">{p.category}</span>
+                                </div>
+                            </div>
+
+                            <button
+                                onClick={() => handleDelete(p._id)}
+                                className="w-full py-4 rounded-2xl bg-red-50 text-red-500 font-black text-[10px] uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 hover:text-white"
+                            >
+                                Remove From Vault
+                            </button>
+                        </div>
+                    ))}
                 </div>
+
+                {products.length === 0 && (
+                    <div className="text-center py-40 border-2 border-dashed border-slate-100 rounded-[4rem]">
+                        <p className="text-slate-200 font-black text-5xl uppercase italic tracking-tighter">Vault is Empty</p>
+                        <p className="text-slate-400 mt-4 font-bold uppercase text-[10px] tracking-widest">Start adding your exclusive collection</p>
+                    </div>
+                )}
             </div>
         </div>
     );
 };
 
-export default AdminDashboard;
+export default Dashboard;
