@@ -14,6 +14,7 @@ import Orders from './pages/Orders';
 import Customers from './pages/Customers';
 import OrderDetail from './pages/OrderDetail';
 
+
 function App() {
   return (
     <Router>
@@ -27,6 +28,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/admin" element={<AdminLogin />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/add-product" element={<AddProductPage />} />
         <Route path="/admin-products" element={<Products />} />
         <Route path="/admin-orders" element={<Orders />} />
         <Route path="/admin-customers" element={<Customers />} />
