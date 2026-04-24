@@ -39,3 +39,7 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`🚀 Perfume Shop Server running on port ${PORT}`);
 });
+// Routes registration se pehle ye dalo:
+app.get('/', (req, res) => {
+    res.send("🚀 GRAINIAC LUXE API is running perfectly!");
+});
