@@ -43,3 +43,8 @@ app.listen(PORT, () => {
 app.get('/', (req, res) => {
     res.send("🚀 GRAINIAC LUXE API is running perfectly!");
 });
+// server.js mein routes ke niche ye add karo
+app.get('/api/customers', (req, res) => {
+    // Abhi hamare paas customers nahi hain, toh khali array bhej do
+    res.json([]);
+});
