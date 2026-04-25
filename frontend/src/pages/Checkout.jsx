@@ -40,7 +40,7 @@ const Checkout = () => {
             // API Call to save order
             // await axios.post('http://localhost:5000/api/orders/add', orderData);
             // Checkout.jsx ke andar:
-            await axios.post('http://localhost:5000/api/orders/add', orderData);
+            await axios.post('https://grainiac-luxe-backend.onrender.com', orderData);
             alert("🎉 GRAINIAC LUXE: Order Successful!");
 
             // Cleanup: Cart khali karna aur UI refresh

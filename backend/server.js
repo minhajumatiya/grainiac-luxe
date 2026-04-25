@@ -48,3 +48,41 @@ app.get('/api/customers', (req, res) => {
     // Abhi hamare paas customers nahi hain, toh khali array bhej do
     res.json([]);
 });
+// backend/routes/adminRoutes.js ya server.js mein
+app.get('/api/admin/stats', async (req, res) => {
+    try {
+        const totalProducts = await Product.countDocuments();
+        const totalCustomers = await User.countDocuments(); // 'User' aapka customer model hai
+
+        // Maa lo aapke paas Order model hai
+        const allOrders = await Order.find();
+
+        // 1. Total Revenue Calculation
+        const totalRevenue = allOrders.reduce((sum, order) => sum + order.totalAmount, 0);
+
+        // 2. Monthly Logic (Comparison)
+        const now = new Date();
+        const thisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+
+        const currentMonthSales = allOrders.filter(o => new Date(o.createdAt) >= thisMonth);
+        const lastMonthSales = allOrders.filter(o => new Date(o.createdAt) >= lastMonth && new Date(o.createdAt) < thisMonth);
+
+        const currentTotal = currentMonthSales.reduce((sum, o) => sum + o.totalAmount, 0);
+        const lastTotal = lastMonthSales.reduce((sum, o) => sum + o.totalAmount, 0);
+
+        // Percentage Change
+        const percentageChange = lastTotal === 0 ? 100 : ((currentTotal - lastTotal) / lastTotal) * 100;
+
+        res.json({
+            totalProducts,
+            totalCustomers,
+            totalRevenue,
+            currentTotal,
+            percentageChange: percentageChange.toFixed(2),
+            allTimeSales: allOrders.length
+        });
+    } catch (err) {
+        res.status(500).json({ error: "Stats load nahi ho paye" });
+    }
+});
