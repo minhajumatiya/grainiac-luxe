@@ -3,50 +3,50 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const AdminLogin = () => {
-    const [credentials, setCredentials] = useState({ email: '', password: '' });
+    const [mobile, setMobile] = useState('');
+    const [password, setPassword] = useState('');
     const navigate = useNavigate();
+    const BACKEND_URL = 'https://grainiac-luxe-backend.onrender.com';
 
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
-            // Yahan aap apna backend admin login API call karenge
-            const res = await axios.post('https://grainiac-luxe-backend.onrender.com/api/admin/login', credentials);
-            localStorage.setItem('adminToken', res.data.token);
-            alert("Admin Login Successful!");
-            navigate('/dashboard');
+            const res = await axios.post(`${BACKEND_URL}/api/auth/login`, { mobile, password });
+            localStorage.setItem('token', res.data.token); // Token save karo
+            alert("Welcome Back, Boss!");
+            navigate('/dashboard'); // Login hote hi dashboard bhejo
         } catch (err) {
-            alert("Invalid Admin Credentials!");
+            alert(err.response?.data?.message || "Login Failed!");
         }
     };
 
     return (
-        <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6">
-            <div className="max-w-md w-full bg-white rounded-[2.5rem] p-10 shadow-2xl">
-                <h2 className="text-3xl font-black text-center mb-2 tracking-tighter">ADMIN ACCESS</h2>
-                <p className="text-slate-400 text-center text-sm mb-8 font-bold uppercase tracking-widest">Grainiac Luxe Control</p>
+        <div className="min-h-screen flex items-center justify-center bg-white p-6">
+            <form onSubmit={handleLogin} className="bg-slate-50 p-12 rounded-[3rem] shadow-2xl w-full max-w-md border-2 border-slate-100">
+                <p className="text-[#d4af37] font-black text-[10px] uppercase tracking-[0.4em] mb-4 text-center">Security Check</p>
+                <h2 className="text-4xl font-black mb-10 text-center italic uppercase tracking-tighter">Admin <span className="text-slate-300">Access</span></h2>
 
-                <form onSubmit={handleLogin} className="space-y-5">
+                <div className="space-y-6">
                     <input
-                        type="email"
-                        placeholder="Admin Email"
-                        className="w-full p-4 bg-slate-50 rounded-2xl border-none outline-none focus:ring-2 ring-[#d4af37]"
-                        onChange={(e) => setCredentials({ ...credentials, email: e.target.value })}
+                        type="number"
+                        placeholder="Mobile Number"
+                        className="w-full p-5 bg-white rounded-2xl outline-none shadow-inner border-none focus:ring-2 ring-black transition-all"
+                        onChange={e => setMobile(e.target.value)}
                         required
                     />
                     <input
                         type="password"
                         placeholder="Password"
-                        className="w-full p-4 bg-slate-50 rounded-2xl border-none outline-none focus:ring-2 ring-[#d4af37]"
-                        onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
+                        className="w-full p-5 bg-white rounded-2xl outline-none shadow-inner border-none focus:ring-2 ring-black transition-all"
+                        onChange={e => setPassword(e.target.value)}
                         required
                     />
-                    <button className="w-full bg-black text-white py-5 rounded-2xl font-black text-lg hover:bg-[#d4af37] transition-all">
-                        ENTER DASHBOARD
+                    <button className="w-full bg-black text-white p-5 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-[#d4af37] hover:text-black transition-all shadow-xl active:scale-95">
+                        Authorize Now
                     </button>
-                </form>
-            </div>
+                </div>
+            </form>
         </div>
     );
 };
-
 export default AdminLogin;
