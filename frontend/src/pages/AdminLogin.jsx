@@ -10,7 +10,7 @@ const AdminLogin = () => {
         e.preventDefault();
         try {
             // Yahan aap apna backend admin login API call karenge
-            const res = await axios.post('http://localhost:5000/api/admin/login', credentials);
+            const res = await axios.post('https://grainiac-luxe-backend.onrender.com/api/admin/login', credentials);
             localStorage.setItem('adminToken', res.data.token);
             alert("Admin Login Successful!");
             navigate('/dashboard');
