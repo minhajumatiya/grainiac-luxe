@@ -2,54 +2,48 @@ import React, { useState, useContext } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { CartContext } from '../context/CartContext';
-import UserNavbar from '../components/UserNavbar'; // Navbar consistency ke liye
+import UserNavbar from '../components/UserNavbar';
 
 const Checkout = () => {
     const navigate = useNavigate();
     const { updateCartCount } = useContext(CartContext);
 
-    // LocalStorage se cart items uthana
+    // 🔥 LIVE BACKEND URL (Ise ek hi jagah set kar diya)
+    const BACKEND_URL = 'https://grainiac-luxe-backend.onrender.com';
+
     const cartItems = JSON.parse(localStorage.getItem('cart')) || [];
-
-    // Total price calculate karna
     const total = cartItems.reduce((acc, item) => acc + Number(item.price), 0);
-
-    // User input state
     const [user, setUser] = useState({ name: '', mobile: '', address: '' });
 
     const placeOrder = async (e) => {
         e.preventDefault();
 
-        // --- ORDER DATA OBJECT ---
         const orderData = {
             customerName: user.name,
             mobile: user.mobile,
             address: user.address,
-            // Items map jisme ab ML Size bhi jayega
             items: cartItems.map(item => ({
                 name: item.name,
                 price: item.price,
                 imageUrl: item.imageUrl,
-                selectedSize: item.selectedSize, // <--- Ye line ab database mein size bhejegi
+                selectedSize: item.selectedSize,
                 quantity: 1
             })),
             totalAmount: total
         };
 
         try {
-            // API Call to save order
-            // await axios.post('http://localhost:5000/api/orders/add', orderData);
-            // Checkout.jsx ke andar:
-            await axios.post('https://grainiac-luxe-backend.onrender.com', orderData);
+            // ✅ AB YE SAHI HAI: Pura rasta (Path) likha hai
+            await axios.post(`${BACKEND_URL}/api/orders/add`, orderData);
+
             alert("🎉 GRAINIAC LUXE: Order Successful!");
 
-            // Cleanup: Cart khali karna aur UI refresh
             localStorage.removeItem('cart');
             updateCartCount();
-            navigate('/'); // Home page par wapas bhej dena
+            navigate('/');
         } catch (err) {
             console.error(err);
-            alert("Order Fail ho gaya! Backend console check karein.");
+            alert("Order Fail! Render ke Logs check karein.");
         }
     };
 
@@ -100,7 +94,12 @@ const Checkout = () => {
                                 {cartItems.map((item, i) => (
                                     <div key={i} className="flex justify-between items-center gap-4">
                                         <div className="flex items-center gap-3">
-                                            <img src={`http://localhost:5000${item.imageUrl}`} className="w-12 h-12 rounded-xl object-contain bg-white border" alt="" />
+                                            {/* ✅ IMAGE URL FIXED: Localhost hata kar BACKEND_URL lagaya */}
+                                            <img
+                                                src={`${BACKEND_URL}${item.imageUrl}`}
+                                                className="w-12 h-12 rounded-xl object-contain bg-white border"
+                                                alt=""
+                                            />
                                             <div>
                                                 <p className="text-sm font-bold text-slate-800">{item.name}</p>
                                                 <p className="text-[10px] font-black text-[#d4af37] uppercase">{item.selectedSize}</p>
