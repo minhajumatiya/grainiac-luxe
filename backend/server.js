@@ -8,6 +8,7 @@ const path = require('path');
 const authRoutes = require('./routes/authRoutes');
 const productRoutes = require('./routes/productRoutes');
 const orderRoutes = require('./routes/orderRoutes');
+const Order = require('../models/Order'); // Pakka check karna ye model hai
 
 const app = express();
 
@@ -84,5 +85,37 @@ app.get('/api/admin/stats', async (req, res) => {
         });
     } catch (err) {
         res.status(500).json({ error: "Stats load nahi ho paye" });
+    }
+});
+app.get('/api/admin/stats', async (req, res) => {
+    try {
+        const totalProducts = await Product.countDocuments();
+        const orders = await Order.find();
+
+        // Revenue calculation (Agar orders khali hain toh 0 dikhayega, crash nahi hoga)
+        const totalRevenue = orders.reduce((sum, o) => sum + (o.totalAmount || 0), 0);
+
+        // Recent Orders list (Top 5)
+        const recentOrders = await Order.find().sort({ createdAt: -1 }).limit(5);
+
+        res.json({
+            totalProducts,
+            totalOrders: orders.length,
+            totalRevenue,
+            recentOrders
+        });
+    } catch (err) {
+        console.error("Stats Error:", err);
+        res.status(500).json({ error: "Server ke andar kuch phat gaya!" });
+    }
+});
+
+// Saare orders dekhne ke liye (Dashboard ke liye)
+app.get('/api/orders', async (req, res) => {
+    try {
+        const orders = await Order.find().sort({ createdAt: -1 });
+        res.json(orders);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
     }
 });
