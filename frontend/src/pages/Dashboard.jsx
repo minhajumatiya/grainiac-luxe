@@ -3,104 +3,103 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
-    const [data, setData] = useState({ totalProducts: 0, totalOrders: 0, totalRevenue: 0, recentOrders: [] });
-    const [allOrders, setAllOrders] = useState([]);
+    const [stats, setStats] = useState(null);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
     const BACKEND_URL = 'https://grainiac-luxe-backend.onrender.com';
 
     useEffect(() => {
-        const fetchAll = async () => {
-            try {
-                const [statsRes, ordersRes] = await Promise.all([
-                    axios.get(`${BACKEND_URL}/api/admin/stats`),
-                    axios.get(`${BACKEND_URL}/api/orders`)
-                ]);
-                setData(statsRes.data);
-                setAllOrders(ordersRes.data);
-            } catch (err) { console.log("Fetch error"); }
-            setLoading(false);
-        };
-        fetchAll();
+        axios.get(`${BACKEND_URL}/api/admin/stats`)
+            .then(res => { setStats(res.data); setLoading(false); })
+            .catch(err => { console.error(err); setLoading(false); });
     }, []);
 
-    if (loading) return <div className="min-h-screen flex items-center justify-center font-black uppercase italic">Grainiac Luxe Business Loading...</div>;
+    if (loading) return <div className="h-screen flex items-center justify-center font-black text-purple-600 italic">LEXRON LOADING...</div>;
 
     return (
-        <div className="min-h-screen bg-[#fcfcfc] p-6 md:p-12 text-slate-900">
-            <div className="max-w-7xl mx-auto">
+        <div className="flex min-h-screen bg-[#F8F9FD] text-[#2D3142] font-sans">
+            {/* --- SIDEBAR --- */}
+            <div className="w-72 bg-white p-8 flex flex-col gap-10 border-r border-gray-100">
+                <h1 className="text-3xl font-black text-[#7B61FF] italic tracking-tighter">Lexron.</h1>
+                <div className="flex flex-col gap-2">
+                    <button className="flex items-center gap-4 p-4 bg-[#F0EEFF] text-[#7B61FF] rounded-2xl font-bold">📊 Dashboard</button>
+                    <button onClick={() => navigate('/admin-products')} className="flex items-center gap-4 p-4 text-gray-400 hover:text-[#7B61FF] font-bold">📦 Inventory</button>
+                    <button className="flex items-center gap-4 p-4 text-gray-400 hover:text-[#7B61FF] font-bold">🛒 Sales</button>
+                    <button className="flex items-center gap-4 p-4 text-gray-400 hover:text-[#7B61FF] font-bold">⚙️ Settings</button>
+                </div>
+            </div>
 
-                {/* Header */}
-                <div className="flex justify-between items-end mb-16 border-b-2 pb-8">
+            {/* --- MAIN CONTENT --- */}
+            <div className="flex-1 p-12 overflow-y-auto">
+                <div className="flex justify-between items-center mb-12">
                     <div>
-                        <p className="text-[#d4af37] font-black text-[10px] uppercase tracking-[0.5em] mb-2">Grainiac Exim Portal</p>
-                        <h1 className="text-6xl font-black uppercase italic tracking-tighter">Owner <span className="text-slate-300">Desk</span></h1>
+                        <h2 className="text-4xl font-black tracking-tight">Welcome Back! 👋</h2>
+                        <p className="text-gray-400 font-medium">Grainiac Luxe Business Overview</p>
                     </div>
-                    <button onClick={() => navigate('/add-product')} className="bg-black text-white px-8 py-4 rounded-full font-black text-[10px] uppercase tracking-widest hover:bg-[#d4af37] transition-all">+ Add Product</button>
+                    <button onClick={() => navigate('/add-product')} className="bg-[#7B61FF] text-white px-8 py-4 rounded-2xl font-bold shadow-lg shadow-purple-200 active:scale-95 transition-all">+ New Product</button>
                 </div>
 
-                {/* Stats Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-                    <div className="bg-black text-white p-10 rounded-[3rem] shadow-2xl">
-                        <p className="text-gray-500 font-bold text-[10px] uppercase tracking-widest mb-2">Total Revenue</p>
-                        <h3 className="text-4xl font-black italic">₹{data.totalRevenue.toLocaleString()}</h3>
+                {/* --- STATS CARDS --- */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+                    <div className="bg-white p-8 rounded-[2.5rem] shadow-sm">
+                        <p className="text-gray-400 text-xs font-bold uppercase mb-2">Total Revenue</p>
+                        <h3 className="text-3xl font-black">₹{stats?.totalRevenue.toLocaleString()}</h3>
                     </div>
-                    <div className="bg-white p-10 rounded-[3rem] border shadow-sm">
-                        <p className="text-slate-400 font-bold text-[10px] uppercase tracking-widest mb-2">Total Orders</p>
-                        <h3 className="text-4xl font-black italic">{allOrders.length}</h3>
+                    <div className="bg-white p-8 rounded-[2.5rem] shadow-sm border-l-4 border-purple-500">
+                        <p className="text-gray-400 text-xs font-bold uppercase mb-2">Monthly Sales</p>
+                        <h3 className="text-3xl font-black">₹{stats?.thisMonthRev.toLocaleString()}</h3>
                     </div>
-                    <div className="bg-white p-10 rounded-[3rem] border shadow-sm">
-                        <p className="text-slate-400 font-bold text-[10px] uppercase tracking-widest mb-2">Total Scents</p>
-                        <h3 className="text-4xl font-black italic">{data.totalProducts}</h3>
+                    <div className="bg-white p-8 rounded-[2.5rem] shadow-sm">
+                        <p className="text-gray-400 text-xs font-bold uppercase mb-2">Growth</p>
+                        <h3 className={`text-3xl font-black ${stats?.growth >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                            {stats?.growth}% {stats?.growth >= 0 ? '↑' : '↓'}
+                        </h3>
+                    </div>
+                    <div className="bg-white p-8 rounded-[2.5rem] shadow-sm">
+                        <p className="text-gray-400 text-xs font-bold uppercase mb-2">Active Users</p>
+                        <h3 className="text-3xl font-black">{stats?.totalUsers}</h3>
                     </div>
                 </div>
 
-                {/* --- ORDERS TABLE (Jahan aapko order dikhenge) --- */}
-                <div className="bg-white rounded-[3rem] border-2 border-slate-100 shadow-xl overflow-hidden mb-20">
-                    <div className="p-8 bg-slate-50 border-b">
-                        <h2 className="text-xl font-black uppercase italic tracking-tight">Recent Customer Orders</h2>
-                    </div>
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left">
-                            <thead className="bg-white">
-                                <tr className="text-[10px] uppercase tracking-widest text-slate-400 border-b">
-                                    <th className="p-8">Customer</th>
-                                    <th className="p-8">Items</th>
-                                    <th className="p-8">Amount</th>
-                                    <th className="p-8">Status</th>
-                                    <th className="p-8">Action</th>
+                {/* --- RECENT ORDERS TABLE --- */}
+                <div className="bg-white p-10 rounded-[3rem] shadow-sm border border-gray-50">
+                    <h3 className="text-xl font-black mb-8 italic">Latest Transactions</h3>
+                    <table className="w-full text-left">
+                        <thead>
+                            <tr className="text-gray-300 text-[10px] uppercase tracking-widest border-b pb-4">
+                                <th className="pb-6">Customer</th>
+                                <th className="pb-6">Status</th>
+                                <th className="pb-6">Amount</th>
+                                <th className="pb-6">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {stats?.recentOrders.map((order) => (
+                                <tr key={order._id} className="border-b last:border-0 hover:bg-gray-50 transition-all group">
+                                    <td className="py-6 font-bold">
+                                        {order.customerName} <br />
+                                        <span className="text-[10px] text-gray-400 font-medium">{order.mobile}</span>
+                                    </td>
+                                    <td className="py-6">
+                                        <span className="bg-green-100 text-green-600 px-3 py-1 rounded-full text-[9px] font-black uppercase">Paid</span>
+                                    </td>
+                                    <td className="py-6 font-black text-lg">₹{order.totalAmount}</td>
+                                    <td className="py-6">
+                                        <button
+                                            onClick={() => navigate(`/admin-orders/${order._id}`)}
+                                            className="bg-[#7B61FF] text-white text-[10px] font-black uppercase px-4 py-2 rounded-xl opacity-0 group-hover:opacity-100 transition-all shadow-md"
+                                        >
+                                            Details
+                                        </button>
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                {allOrders.map(order => (
-                                    <tr key={order._id} className="border-b hover:bg-slate-50 transition-all">
-                                        <td className="p-8">
-                                            <p className="font-black text-slate-800 uppercase">{order.customerName}</p>
-                                            <p className="text-[10px] font-bold text-slate-400">{order.mobile}</p>
-                                        </td>
-                                        <td className="p-8 text-xs font-bold text-slate-600">{order.items.length} Scent(s)</td>
-                                        <td className="p-8 font-black text-lg">₹{order.totalAmount}</td>
-                                        <td className="p-8">
-                                            <span className="bg-yellow-100 text-yellow-600 px-3 py-1 rounded-full text-[9px] font-black uppercase">Pending</span>
-                                        </td>
-                                        <td className="p-8">
-                                            {/* 🔥 Ispe click karte hi Details page khulega */}
-                                            <button
-                                                onClick={() => navigate(`/admin-orders/${order._id}`)}
-                                                className="text-[#d4af37] font-black text-[10px] uppercase underline tracking-widest"
-                                            >
-                                                View Details
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                        {allOrders.length === 0 && <p className="p-20 text-center font-black uppercase italic text-slate-200 text-4xl">No Orders Yet</p>}
-                    </div>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     );
 };
+
 export default Dashboard;

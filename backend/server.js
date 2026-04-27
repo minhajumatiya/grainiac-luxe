@@ -2,98 +2,64 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
-require('dotenv').config();
 
-// 1. MODELS IMPORT (Pakka check karein ki ye files isi naam se hain)
+// MODELS IMPORT (File names check kar lena)
 const Product = require('./models/Product');
 const Order = require('./models/Order');
-const User = require('./models/User'); // Agar aapka model Admin hai toh yahan badal dein
+const User = require('./models/User');
 
 const app = express();
-
-// 2. MIDDLEWARE
 app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// 3. DATABASE CONNECTION
-mongoose.connect(process.env.MONGO_URI)
-    .then(() => console.log("🔥 GRAINIAC LUXE: Cloud Database Connected!"))
-    .catch(err => console.log("❌ DB Connection Error:", err));
-
-// --- 4. ADMIN STATS ROUTE (500 Error Fix) ---
+// --- 🔥 THE LEXRON STATS ROUTE ---
 app.get('/api/admin/stats', async (req, res) => {
     try {
         const totalProducts = await Product.countDocuments();
-        const totalCustomers = await User.countDocuments();
+        const totalUsers = await User.countDocuments();
         const orders = await Order.find().sort({ createdAt: -1 });
 
-        // Revenue Calculation
+        // 1. Total Revenue
         const totalRevenue = orders.reduce((sum, o) => sum + (Number(o.totalAmount) || 0), 0);
+
+        // 2. Growth Calculation (Last 30 Days vs Previous 30 Days)
+        const now = new Date();
+        const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+        const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+
+        const thisMonthOrders = orders.filter(o => new Date(o.createdAt) >= thisMonthStart);
+        const lastMonthOrders = orders.filter(o => new Date(o.createdAt) >= lastMonthStart && new Date(o.createdAt) < thisMonthStart);
+
+        const thisMonthRev = thisMonthOrders.reduce((sum, o) => sum + (Number(o.totalAmount) || 0), 0);
+        const lastMonthRev = lastMonthOrders.reduce((sum, o) => sum + (Number(o.totalAmount) || 0), 0);
+
+        let growth = 0;
+        if (lastMonthRev > 0) {
+            growth = ((thisMonthRev - lastMonthRev) / lastMonthRev) * 100;
+        } else if (thisMonthRev > 0) { growth = 100; }
 
         res.json({
             totalProducts,
-            totalCustomers,
-            totalOrders: orders.length,
+            totalUsers,
             totalRevenue,
-            recentOrders: orders.slice(0, 5) // Dashboard ke liye top 5
+            thisMonthRev,
+            growth: growth.toFixed(1),
+            recentOrders: orders.slice(0, 8)
         });
     } catch (err) {
-        console.error("Stats Error:", err);
-        res.status(500).json({ error: "Backend phat gaya: " + err.message });
-    }
-});
-
-// --- 5. ORDERS ROUTES ---
-// Saare orders dekhne ke liye
-app.get('/api/orders', async (req, res) => {
-    try {
-        const orders = await Order.find().sort({ createdAt: -1 });
-        res.json(orders);
-    } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
 
-// Naya Order add karne ke liye (Checkout ke liye)
-app.post('/api/orders/add', async (req, res) => {
-    try {
-        const newOrder = new Order(req.body);
-        await newOrder.save();
-        res.status(201).json({ message: "Order Placed!", order: newOrder });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
-
-// Single Order Detail dekhne ke liye
+// Single Order Route
 app.get('/api/orders/:id', async (req, res) => {
     try {
         const order = await Order.findById(req.params.id);
-        if (!order) return res.status(404).json({ message: "Order nahi mila" });
         res.json(order);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+    } catch (err) { res.status(404).json({ message: "Not found" }); }
 });
 
-// --- 6. PRODUCT ROUTES ---
-const productRoutes = require('./routes/productRoutes');
-app.use('/api/products', productRoutes);
-
-// --- 7. AUTH ROUTES ---
-const authRoutes = require('./routes/authRoutes');
-app.use('/api/auth', authRoutes);
-
-// Dummy Customers route (Crash se bachne ke liye)
-app.get('/api/customers', async (req, res) => {
-    try {
-        const customers = await User.find();
-        res.json(customers);
-    } catch (err) {
-        res.json([]);
-    }
-});
-
+// Port & Listen
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`🚀 Lexron Backend on ${PORT}`));
