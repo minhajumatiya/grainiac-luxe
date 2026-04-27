@@ -9,7 +9,7 @@ const TrackOrder = () => {
     const handleTrack = async (e) => {
         e.preventDefault();
         try {
-            const res = await axios.get(`http://localhost:5000/api/orders/track/${mobile}`);
+            const res = await axios.get(`http://https://grainiac-luxe-backend.onrender.com/api/orders/track/${mobile}`);
             setOrders(res.data);
         } catch (err) { alert("No orders found!"); }
     };

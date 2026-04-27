@@ -42,7 +42,7 @@ const Cart = () => {
                             <div key={index} className="flex items-center gap-6 p-4 bg-slate-50 rounded-[2rem] border border-slate-100 shadow-sm group">
                                 <div className="w-24 h-24 bg-white rounded-2xl p-2 overflow-hidden border border-slate-100">
                                     <img
-                                        src={`http://localhost:5000${item.imageUrl}`}
+                                        src={`http://https://grainiac-luxe-backend.onrender.com${item.imageUrl}`}
                                         className="w-full h-full object-contain group-hover:scale-110 transition duration-500"
                                         alt={item.name}
                                     />
