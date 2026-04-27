@@ -38,7 +38,7 @@ const ProductDetail = () => {
             <UserNavbar />
             <main className="max-w-7xl mx-auto px-10 py-16 grid grid-cols-1 lg:grid-cols-2 gap-16">
                 <div className="bg-slate-50 rounded-[3rem] p-12 flex items-center justify-center border shadow-inner">
-                    <img src={`http://localhost:5000${product.imageUrl}`} className="w-full max-h-[500px] object-contain hover:scale-105 transition duration-500" alt="" />
+                    <img src={`http://grainiac-luxe-backend.onrender.com/${product.imageUrl}`} className="w-full max-h-[500px] object-contain hover:scale-105 transition duration-500" alt="" />
                 </div>
                 <div className="flex flex-col justify-center">
                     <h1 className="text-5xl font-black mb-2 uppercase tracking-tighter italic">{product.name}</h1>
